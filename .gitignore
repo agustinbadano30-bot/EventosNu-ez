@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.streamlit/
+.env
+venv/
+.vscode/
+partidos_vistos.json
+results_dump.html
+debug_*.py
+*.log
