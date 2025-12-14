@@ -22,7 +22,11 @@ MONTHS_ES = {
     "julio": 7, "agosto": 8, "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12 
 }
 
-# 3. RECITALES MONUMENTAL (Hardcoded / Manual)
+# 3. GOOGLE SHEET (CSV)
+# Link público "Publish to Web" -> CSV
+SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQVbJOia6Aaoa7T7r-7eUEZ0laciKatu07PVuPa61FDLyhfaNyrzLVofMbBzYUroFufae-VhQTIvA6O/pub?output=csv"
+
+# 4. RECITALES MONUMENTAL (Hardcoded / Fallback)
 # Fuente: Web Search (LiveNation/Songkick blocked)
 MONUMENTAL_CONCERTS = [
     {"fecha": "2025-10-04", "evento": "Kendrick Lamar", "lugar": "Monumental (Recital)"},

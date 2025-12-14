@@ -194,11 +194,47 @@ def get_obras_events(year_context=2025):
             
     return events
 
+
 def get_monumental_concerts():
     """
-    Returns hardcoded concerts from config.
+    Tries to fetch from Google Sheets (CSV).
+    If fails, falls back to hardcoded MONUMENTAL_CONCERTS.
     """
     events = []
+    
+    # 1. Try Google Sheet
+    try:
+        from config import SHEET_URL
+        if SHEET_URL:
+            import io
+            r = requests.get(SHEET_URL, timeout=5)
+            r.raise_for_status()
+            
+            df = pd.read_csv(io.StringIO(r.text))
+            # Normalize columns to lowercase
+            df.columns = [c.lower().strip() for c in df.columns]
+            
+            for _, row in df.iterrows():
+                try:
+                    fecha_str = str(row['fecha']).strip()
+                    dt = datetime.strptime(fecha_str, "%Y-%m-%d")
+                    events.append({
+                        "fecha": fecha_str,
+                        "evento": row['evento'],
+                        "lugar": row['lugar'],
+                        "obj_date": dt
+                    })
+                except: continue
+                
+            if events:
+                # Override default logic since we have sheet data
+                return events
+    except Exception as e:
+        print(f"Sheet Error: {e}")
+        # Consider showing a warning in UI if needed, but fallback is safer
+
+
+    # 2. Fallback to Config
     for c in MONUMENTAL_CONCERTS:
         try:
             dt = datetime.strptime(c["fecha"], "%Y-%m-%d")
@@ -209,6 +245,7 @@ def get_monumental_concerts():
                 "obj_date": dt
             })
         except: pass
+        
     return events
 
 # --- MAIN APP ---
