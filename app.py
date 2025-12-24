@@ -67,41 +67,59 @@ def parse_espn_date(date_str, year_context=2025):
         
     return None
 
-def parse_obras_date(text, year_context=2025):
+def parse_obras_dates(text, year_context=2025):
     """
-    Parses Obras format from full card text.
-    Looking for "20 de Diciembre" or any "DD ... Month" pattern.
+    Robustly parses multiple dates from event text.
+    Supports: "27 y 28 de Diciembre", "10, 11 y 12 de Febrero", "31 de Enero y 1 de Febrero"
+    Returns a list of datetime objects.
     """
-    if not text: return None
+    if not text: return []
     text = text.lower()
+    found_dates = []
+
+    # Find all month occurrences
+    sorted_months = sorted(MONTHS_ES.keys(), key=len, reverse=True)
+    month_pattern = "|".join(sorted_months)
     
-    # Reuse Relaxed logic or slightly distinct if needed. 
-    # For safe keeping, identical relaxed logic is best.
+    month_matches = list(re.finditer(fr'\b({month_pattern})\b', text))
     
-    # 1. Find Day
-    day_match = re.search(r'(\d{1,2})', text)
-    if day_match:
-        try:
-            day = int(day_match.group(1))
-            
-            # Find Month
-            sorted_months = sorted(MONTHS_ES.keys(), key=len, reverse=True)
-            for m_key in sorted_months:
-                 # Check if month name appears after the day digit to avoid false positives?
-                 # Obras usually: "27 y 28 de Diciembre"
-                 if m_key in text:
-                     month = MONTHS_ES[m_key]
-                     
-                     # Year logic check
-                     year = year_context
-                     y_match = re.search(r'20\d{2}', text)
-                     if y_match:
-                        year = int(y_match.group(0))
-                     
-                     return datetime(year, month, day)
-        except: pass
+    last_end = 0
+    for m in month_matches:
+        month_name = m.group(1)
+        start, end = m.span()
         
-    return None
+        # Look at text immediately preceding this month (context window of 50 chars)
+        snippet_end = start
+        snippet_start = max(last_end, start - 50)
+        snippet = text[snippet_start:snippet_end]
+        
+        # Find all numbers in this snippet
+        nums = re.findall(r'\d{1,2}', snippet)
+        
+        # Extract year (look ahead after month)
+        year = year_context
+        year_snippet = text[end:end+20]
+        y_match = re.search(r'20\d{2}', year_snippet)
+        if y_match:
+            year = int(y_match.group(0))
+        
+        month_val = MONTHS_ES[month_name]
+        
+        # Add valid dates
+        for day_str in nums:
+            try:
+                d = int(day_str)
+                if 1 <= d <= 31:
+                    dt = datetime(year, month_val, d)
+                    # Avoid duplicates
+                    if dt not in found_dates:
+                        found_dates.append(dt)
+            except:
+                pass
+                
+        last_end = end
+
+    return found_dates
 
 # --- SCRAPERS ---
 def get_river_data_combined(year_context=2025):
@@ -182,9 +200,10 @@ def get_obras_events(year_context=2025):
         else:
              card_text = h3.parent.get_text(" ", strip=True)
              
-        dt = parse_obras_date(card_text, year_context)
+        dates = parse_obras_dates(card_text, year_context)
         
-        if dt:
+        # Create one event per date
+        for dt in dates:
             events.append({
                 "fecha": dt.strftime("%Y-%m-%d"),
                 "evento": title,
