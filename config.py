@@ -39,4 +39,12 @@ MONUMENTAL_CONCERTS = [
     {"fecha": "2025-12-13", "evento": "María Becerra", "lugar": "Monumental (Recital)"},
     {"fecha": "2025-12-17", "evento": "Airbag (Cierre)", "lugar": "Monumental (Recital)"},
     {"fecha": "2025-12-18", "evento": "Airbag (Cierre)", "lugar": "Monumental (Recital)"},
+    # 2026
+    {"fecha": "2026-02-13", "evento": "Bad Bunny", "lugar": "Monumental (Recital)"},
+    {"fecha": "2026-02-14", "evento": "Bad Bunny", "lugar": "Monumental (Recital)"},
+    {"fecha": "2026-02-15", "evento": "Bad Bunny", "lugar": "Monumental (Recital)"},
+    {"fecha": "2026-03-23", "evento": "AC/DC", "lugar": "Monumental (Recital)"},
+    {"fecha": "2026-03-27", "evento": "AC/DC", "lugar": "Monumental (Recital)"},
+    {"fecha": "2026-03-31", "evento": "AC/DC", "lugar": "Monumental (Recital)"},
+    {"fecha": "2026-06-06", "evento": "Lali", "lugar": "Monumental (Recital)"},
 ]
