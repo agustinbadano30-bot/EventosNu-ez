@@ -1,8 +1,4 @@
-azure-functions
-fastapi
-uvicorn
+streamlit
 requests
 beautifulsoup4
 pandas
-python-multipart
-# streamlit # Optional: kept for legacy app.py compatibility if needed, but not for Azure
